@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trilha de Lógica e Pseudocódigo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-dark: #0d1117;
+            --card-dark: #161b22;
+            --accent: #238636;
+            --accent-hover: #2ea043;
+            --text-main: #c9d1d9;
+            --portugol-blue: #007acc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        code, pre {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .sidebar-item.active {
+            background-color: #21262d;
+            border-left: 4px solid var(--portugol-blue);
+            color: white;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        .shake {
+            animation: shake 0.5s linear;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .success-pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 160, 67, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); }
+        }
+
+        .family-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 100%);
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-80 bg-[#161b22] border-r border-[#30363d] flex flex-col hidden md:flex">
+        <div class="p-6 border-b border-[#30363d]">
+            <h1 class="text-xl font-bold flex items-start gap-2">
+                <i class="fas fa-laptop-code text-blue-500 mt-1 flex-shrink-0"></i>
+                <div>
+                    Trilha de Lógica <span class="text-blue-500">e Pseudocódigo</span>
+                </div>
+            </h1>
+            <div class="mt-4 bg-[#0d1117] rounded-full h-2 w-full overflow-hidden">
+                <div id="main-progress" class="progress-bar h-full bg-blue-500" style="width: 0%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2" id="progress-text">0% concluído</p>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto custom-scrollbar" id="sidebar-nav">
+            <!-- Items via JS -->
+        </nav>
+
+        <div class="p-4 border-t border-[#30363d] text-xs text-gray-500 text-center italic">
+            "Dominando a lógica de programação passo a passo"
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="h-16 border-b border-[#30363d] flex items-center justify-between px-8 bg-[#0d1117]">
+            <h2 id="current-module-title" class="text-lg font-semibold text-white italic">Carregando...</h2>
+            <div class="flex items-center gap-4">
+                <span id="badge-level" class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded">Estudo de Lógica</span>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-white"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div class="max-w-4xl mx-auto" id="content-container">
+                <!-- Conteúdo via JS -->
+            </div>
+        </div>
+
+        <!-- Action Footer -->
+        <footer class="h-20 border-t border-[#30363d] flex items-center justify-between px-8 bg-[#161b22]">
+            <button id="btn-prev" onclick="changeModule(-1)" class="px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-30">
+                <i class="fas fa-arrow-left mr-2"></i> Anterior
+            </button>
+            
+            <div id="action-center">
+                <!-- Mensagens de feedback aparecem aqui -->
+            </div>
+
+            <button id="btn-next" onclick="changeModule(1)" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors disabled:opacity-30">
+                Próximo <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </footer>
+    </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex flex-col p-6">
+        <div class="flex justify-end mb-8">
+            <button onclick="toggleMobileMenu()" class="text-3xl"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="mobile-nav" class="flex flex-col gap-4 overflow-y-auto"></div>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div id="celebration-overlay" class="fixed inset-0 bg-[#0d1117]/95 z-[100] hidden flex-col items-center justify-center p-6 text-center animate-in fade-in duration-700 backdrop-blur-sm">
+        <div class="max-w-2xl bg-gradient-to-br from-[#1e1b4b] to-[#1e3a8a] p-10 rounded-2xl border-4 border-yellow-500 shadow-[0_0_80px_rgba(234,179,8,0.4)]">
+            <i class="fas fa-trophy text-7xl text-yellow-400 mb-6 animate-bounce"></i>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-wider">Parabéns!</h1>
+            <h2 class="text-2xl text-blue-300 mb-6 font-semibold">Você concluiu a Trilha de Lógica e Pseudocódigo!</h2>
+            <p class="text-lg text-gray-200 mb-8 leading-relaxed">
+                Sua missão foi um sucesso! O código funcionou perfeitamente, a lógica está afiada e você deu seus primeiros passos no mundo da programação através da tecnologia.
+            </p>
+            <div class="bg-yellow-500/20 border-2 border-yellow-500 p-5 rounded-xl animate-pulse">
+                <p class="text-yellow-400 font-bold text-xl flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <i class="fas fa-check-circle text-3xl"></i>
+                    <span>Você completou todas as etapas e desafios desta trilha!</span>
+                </p>
+            </div>
+            <button onclick="closeCelebration()" class="mt-8 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-blue-500/50">
+                Fechar e Rever Trilha
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const modules = [
+            {
+                id: 0,
+                title: "O que é Algoritmos?",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">A Base da Lógica de Programação</h3>
+                    <p class="mb-4">Para iniciar na programação com confiança, você precisa dominar o conceito de <strong>Algoritmo</strong>. Um algoritmo não é apenas o código que você digita; é a lógica e a ideia por trás dele. É uma sequência finita, lógica e bem definida de passos para resolver um problema ou executar uma tarefa.</p>
+                    <p class="mb-4">Os computadores não são inteligentes por si mesmos. Eles apenas executam ordens de forma extremamente rápida. Se você não der as instruções na ordem e no formato corretos, o resultado será um erro (o famoso "bug").</p>
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-2">As 3 Regras de um Bom Algoritmo:</h4>
+                    <ul class="list-disc ml-6 mb-4 space-y-2 text-gray-300">
+                        <li><strong>Deve ter um fim:</strong> Um algoritmo não pode ser executado para sempre. Ele deve chegar a uma conclusão em um período de tempo finito.</li>
+                        <li><strong>Não pode ser ambíguo:</strong> Cada passo deve ser exato. Não se deve instruir "coloque um pouco de sal", e sim instruir "coloque 5 gramas de sal".</li>
+                        <li><strong>A ordem importa:</strong> Na programação, a ordem de execução das instruções é fundamental. Tentar usar uma informação antes de recebê-la ou criá-la vai gerar um erro lógico.</li>
+                    </ul>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-8 mb-4">Exemplo Prático: Algoritmo em Código</h4>
+                    <p class="mb-4 text-gray-300">Veja como a lógica de fazer um bolo (que é um algoritmo do dia a dia) se transforma em código executado de cima para baixo:</p>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    // Exemplo de uma sequência de passos lógicos
+    escreva("1. Separar os ingredientes\\n")
+    escreva("2. Misturar tudo na tigela\\n")
+    escreva("3. Colocar a massa no forno\\n")
+    escreva("4. Bolo pronto!")
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 1,
+                title: "O que é Fluxograma?",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">Desenhando o Pensamento</h3>
+                    <p class="mb-4">Antes de escrever o código, muitas vezes precisamos visualizar o problema. O <strong>Fluxograma</strong> é a representação gráfica de um algoritmo. Ele utiliza formas geométricas padronizadas para ilustrar o fluxo de execução de um programa.</p>
+                    <p class="mb-4">Ao usar um fluxograma, você consegue detectar falhas na lógica muito antes de começar a programar. É o "esboço" do seu software.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">Símbolos Principais:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-[#21262d] p-4 rounded border border-[#30363d] flex items-center gap-4">
+                            <div class="w-16 h-8 border-2 border-green-500 rounded-full flex-shrink-0"></div>
+                            <div>
+                                <strong class="text-white block">Terminal (Início/Fim)</strong>
+                                <span class="text-xs text-gray-400">Marca onde o algoritmo começa e onde termina.</span>
+                            </div>
+                        </div>
+                        <div class="bg-[#21262d] p-4 rounded border border-[#30363d] flex items-center gap-4">
+                            <div class="w-16 h-10 border-2 border-blue-500 flex-shrink-0"></div>
+                            <div>
+                                <strong class="text-white block">Processamento</strong>
+                                <span class="text-xs text-gray-400">Representa um cálculo, uma atribuição ou uma ação interna na memória.</span>
+                            </div>
+                        </div>
+                        <div class="bg-[#21262d] p-4 rounded border border-[#30363d] flex items-center gap-4">
+                            <div class="w-16 h-10 border-2 border-purple-500 transform -skew-x-12 flex-shrink-0 ml-2"></div>
+                            <div>
+                                <strong class="text-white block">Entrada/Saída</strong>
+                                <span class="text-xs text-gray-400">Quando o usuário digita algo ou o programa exibe dados na tela.</span>
+                            </div>
+                        </div>
+                        <div class="bg-[#21262d] p-4 rounded border border-[#30363d] flex items-center gap-4">
+                            <div class="w-12 h-12 border-2 border-yellow-500 transform rotate-45 flex-shrink-0 mx-2"></div>
+                            <div>
+                                <strong class="text-white block">Decisão</strong>
+                                <span class="text-xs text-gray-400">O programa faz uma pergunta. Tem duas saídas possíveis: Sim (Verdadeiro) ou Não (Falso).</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-8 mb-4">Exemplo Prático: Algoritmo "Posso Votar?"</h4>
+                    <p class="mb-4 text-gray-300">Abaixo temos um exemplo de como os símbolos se conectam para formar um fluxograma real que verifica se uma pessoa já tem idade para votar:</p>
+                    
+                    <div class="flex flex-col items-center bg-[#161b22] p-6 rounded-lg border border-[#30363d] w-full max-w-lg mx-auto overflow-hidden">
+                        <!-- Terminal: Início -->
+                        <div class="px-8 py-2 border-2 border-green-500 rounded-full text-white font-bold text-sm bg-[#21262d]">Início</div>
+                        <div class="w-px h-6 bg-gray-500"></div><i class="fas fa-caret-down text-gray-500 -mt-2 text-lg"></i>
+                        
+                        <!-- Entrada: Ler Idade -->
+                        <div class="px-6 py-2 border-2 border-purple-500 transform -skew-x-12 bg-[#21262d]"><span class="block transform skew-x-12 text-white text-sm">Ler <strong>idade</strong></span></div>
+                        <div class="w-px h-6 bg-gray-500"></div><i class="fas fa-caret-down text-gray-500 -mt-2 text-lg"></i>
+                        
+                        <!-- Decisão -->
+                        <div class="w-24 h-24 border-2 border-yellow-500 transform rotate-45 bg-[#21262d] flex items-center justify-center my-2"><span class="block transform -rotate-45 text-white text-xs font-bold text-center">idade<br>>= 16?</span></div>
+                        <div class="w-px h-4 bg-gray-500"></div>
+ 
+                        <!-- Ramificações -->
+                        <div class="flex w-full max-w-[250px] justify-between relative">
+                            <div class="absolute top-0 left-[25%] right-[25%] h-px bg-gray-500"></div>
+                            <div class="flex flex-col items-center w-1/2">
+                                <div class="w-px h-4 bg-gray-500"></div><span class="text-[10px] text-green-400 font-bold bg-[#161b22] px-1 -mt-3 z-10">SIM</span><div class="w-px h-3 bg-gray-500"></div><i class="fas fa-caret-down text-gray-500 -mt-2 text-lg"></i>
+                                <div class="px-3 py-2 border-2 border-blue-500 bg-[#21262d] text-white text-xs text-center mt-1 w-24">Exibir<br>"Pode Votar"</div>
+                            </div>
+                            <div class="flex flex-col items-center w-1/2">
+                                <div class="w-px h-4 bg-gray-500"></div><span class="text-[10px] text-red-400 font-bold bg-[#161b22] px-1 -mt-3 z-10">NÃO</span><div class="w-px h-3 bg-gray-500"></div><i class="fas fa-caret-down text-gray-500 -mt-2 text-lg"></i>
+                                <div class="px-3 py-2 border-2 border-blue-500 bg-[#21262d] text-white text-xs text-center mt-1 w-24">Exibir<br>"Não Vota"</div>
+                            </div>
+                        </div>
+ 
+                        <!-- Convergência -->
+                        <div class="flex w-full max-w-[250px] justify-between relative mt-4">
+                            <div class="flex flex-col items-center w-1/2"><div class="w-px h-6 bg-gray-500"></div></div>
+                            <div class="flex flex-col items-center w-1/2"><div class="w-px h-6 bg-gray-500"></div></div>
+                            <div class="absolute bottom-0 left-[25%] right-[25%] h-px bg-gray-500"></div>
+                        </div>
+                        
+                        <!-- Fim -->
+                        <div class="flex flex-col items-center mt-0">
+                            <div class="w-px h-4 bg-gray-500"></div><i class="fas fa-caret-down text-gray-500 -mt-2 text-lg"></i>
+                            <div class="px-8 py-2 border-2 border-green-500 rounded-full text-white font-bold text-sm bg-[#21262d] mt-1">Fim</div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-8 mb-4">O Fluxograma Transformado em Código:</h4>
+                    <p class="mb-4 text-gray-300">Veja exatamente como o desenho estruturado acima se convertem em código no Portugol:</p>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    inteiro idade
+    
+    // Paralelogramo (Entrada/Saída)
+    escreva("Qual a sua idade? ")
+    leia(idade)
+    
+    // Losango de Decisão
+    se (idade >= 16) {
+      escreva("Pode Votar")
+    } senao {
+      escreva("Não Vota")
+    }
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 2,
+                title: "O que é o Pseudocódigo?",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">A Língua Intermediária</h3>
+                    <p class="mb-4">O computador só entende zeros e uns (Linguagem de Máquina). As linguagens de programação (como Python, C++ ou Java) são a ponte entre nós e a máquina, mas possuem regras rigorosas (sintaxe) geralmente em inglês.</p>
+                    <p class="mb-4">O <strong>Pseudocódigo</strong> (ou Portugol) é uma ferramenta didática. É um "falso código". Ele usa regras semelhantes às linguagens de programação reais, mas permite escrever os comandos em Português, fazendo com que você se foque apenas na lógica e não na complexidade da sintaxe profissional.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">Estrutura Básica no Portugol Studio:</h4>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  // A função início é obrigatória. É aqui que o programa começa a ser executado!
+  funcao inicio() {
+    escreva("Bem-vindo ao mundo da programação!")
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 3,
+                title: "Variáveis e Tipos de Dados",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">A Memória do Computador</h3>
+                    <p class="mb-4">Para que um programa faça cálculos ou se lembre do nome do usuário, ele precisa guardar dados na memória RAM. Uma <strong>variável</strong> é um espaço reservado nessa memória. Podemos imaginar as variáveis como caixas rotuladas onde guardamos informações.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">A Regra dos Tipos:</h4>
+                    <p class="mb-4">No Portugol (e em linguagens como C++ e Java), as variáveis são fortemente tipadas. Isso significa que uma "caixa" criada para números não pode guardar texto.</p>
+                    <ul class="list-disc ml-6 mb-4 space-y-3 text-gray-300">
+                        <li><strong class="text-white">inteiro:</strong> Guarda números exatos, positivos ou negativos, sem casas decimais. (Ex: 10, -5, 2024)</li>
+                        <li><strong class="text-white">real:</strong> Guarda números com parte fracionária. (Ex: 3.14, 19.99, -0.5)</li>
+                        <li><strong class="text-white">cadeia:</strong> Guarda textos, frases ou palavras. Deve estar sempre entre aspas duplas. (Ex: "João", "Olá Mundo")</li>
+                        <li><strong class="text-white">caracter:</strong> Guarda apenas um único símbolo ou letra entre aspas simples. (Ex: 'A', '1', '$')</li>
+                        <li><strong class="text-white">logico:</strong> Só aceita dois valores: <code>verdadeiro</code> ou <code>falso</code>. Fundamental para tomadas de decisão.</li>
+                    </ul>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-8 mb-4">Exemplo Prático: Como Declarar Variáveis no Portugol</h4>
+                    <p class="mb-4 text-gray-300">Para criar essas "caixas" no seu programa, primeiro você define o tipo e depois o nome da variável. Você também pode colocar um valor inicial dentro delas. Veja como se faz na prática:</p>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    // Declarando as variáveis (criando as caixas)
+    inteiro idade = 25
+    real altura = 1.75
+    cadeia nome = "Maria da Silva"
+    caracter genero = 'F'
+    logico gosta_de_programar = verdadeiro
+    
+    // Imprimindo as variáveis na tela
+    escreva("Nome do aluno: ", nome)
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 4,
+                title: "Entrada e Saída de Dados",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">Comunicação Homem-Máquina</h3>
+                    <p class="mb-4">Um programa sem interação não tem muita utilidade. Precisamos enviar dados para dentro do sistema (Entrada) e receber o resultado após o processamento (Saída).</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mt-6 mb-6">
+                        <div class="bg-[#161b22] border border-[#30363d] p-5 rounded-lg">
+                            <h4 class="text-blue-400 font-bold mb-2">Comando de Saída: escreva()</h4>
+                            <p class="text-sm text-gray-300 mb-3">Imprime uma mensagem fixa ou o valor de uma variável na tela do usuário.</p>
+                            <code class="block bg-black p-2 rounded border border-[#30363d] text-green-400 text-xs">escreva("A sua idade é ", idade)</code>
+                        </div>
+                        <div class="bg-[#161b22] border border-[#30363d] p-5 rounded-lg">
+                            <h4 class="text-yellow-400 font-bold mb-2">Comando de Entrada: leia()</h4>
+                            <p class="text-sm text-gray-300 mb-3">Pausa o programa e espera que o usuário digite algo no teclado, guardando esse valor na variável indicada.</p>
+                            <code class="block bg-black p-2 rounded border border-[#30363d] text-green-400 text-xs">leia(idade)</code>
+                        </div>
+                    </div>
+                    
+                    <p class="mb-4 text-gray-300">Observe que a concatenação (o ato de juntar textos com o valor das variáveis na mesma linha) é feita separando-os com uma vírgula <code>,</code> dentro dos parênteses do comando escreva.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">Exemplo Completo:</h4>
+                    <p class="mb-4 text-gray-300">Aqui está o ciclo de comunicação completo em um programa:</p>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    cadeia nome
+    
+    escreva("Qual o seu nome? ") // Saída (Faz a Pergunta)
+    leia(nome) // Entrada (Ouve e guarda a resposta)
+    
+    escreva("Olá, ", nome, "! Bem-vindo(a) ao curso!") // Saída (Entrega o resultado)
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 5,
+                title: "Operadores Aritméticos",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">O Computador como Calculadora</h3>
+                    <p class="mb-4">A base do processamento de dados é a matemática. O Portugol permite realizar cálculos por meio de operadores específicos. A maioria é idêntica à matemática tradicional, mas há um operador especial muito importante na programação.</p>
+                    
+                    <div class="overflow-x-auto mb-6 mt-4">
+                        <table class="w-full text-left border-collapse bg-[#161b22] rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="border-b border-[#30363d] text-blue-300 bg-[#21262d]">
+                                    <th class="py-3 px-4">Operador</th>
+                                    <th class="py-3 px-4">Operação</th>
+                                    <th class="py-3 px-4">Exemplo (Resultado)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-[#30363d]">
+                                    <td class="py-2 px-4 font-mono text-white text-center text-lg">+</td>
+                                    <td class="py-2 px-4">Soma</td>
+                                    <td class="py-2 px-4 font-mono">10 + 5 (15)</td>
+                                </tr>
+                                <tr class="border-b border-[#30363d]">
+                                    <td class="py-2 px-4 font-mono text-white text-center text-lg">-</td>
+                                    <td class="py-2 px-4">Subtração</td>
+                                    <td class="py-2 px-4 font-mono">10 - 5 (5)</td>
+                                </tr>
+                                <tr class="border-b border-[#30363d]">
+                                    <td class="py-2 px-4 font-mono text-white text-center text-lg">*</td>
+                                    <td class="py-2 px-4">Multiplicação</td>
+                                    <td class="py-2 px-4 font-mono">10 * 5 (50)</td>
+                                </tr>
+                                <tr class="border-b border-[#30363d]">
+                                    <td class="py-2 px-4 font-mono text-white text-center text-lg">/</td>
+                                    <td class="py-2 px-4">Divisão</td>
+                                    <td class="py-2 px-4 font-mono">10 / 5 (2)</td>
+                                </tr>
+                                <tr class="bg-yellow-900/20">
+                                    <td class="py-2 px-4 font-mono text-yellow-400 font-bold text-center text-lg">%</td>
+                                    <td class="py-2 px-4 text-yellow-400 font-bold">Módulo (Resto da Divisão)</td>
+                                    <td class="py-2 px-4 font-mono text-yellow-400 font-bold">10 % 3 (1)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h4 class="text-lg font-semibold text-white mb-2">O Segredo do Módulo (%)</h4>
+                    <p class="mb-4 text-gray-300">Este operador não tem relação com porcentagem! Ele devolve o <strong>resto de uma divisão inteira</strong>. Se você dividir 10 por 3, o resultado da divisão inteira é 3, e sobra 1. Logo, <code>10 % 3</code> resulta em 1. É um operador muito útil na programação, por exemplo, para descobrir se um número é par ou ímpar (verificando se o resto da divisão por 2 é igual a zero).</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">A Matemática no Código:</h4>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    inteiro a = 10
+    inteiro b = 3
+    
+    escreva("Soma: ", a + b, "\\n")
+    escreva("Multiplicação: ", a * b, "\\n")
+    escreva("Resto da divisão (10 por 3): ", a % b) // Imprime 1
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 6,
+                title: "Operadores Relacionais",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">Criando Comparações</h3>
+                    <p class="mb-4">Para que um programa tome decisões, ele precisa avaliar o estado dos dados. É aqui que entram os operadores relacionais. O resultado de uma expressão relacional nunca é um número ou um texto, mas sim um valor lógico: <strong>verdadeiro</strong> ou <strong>falso</strong>.</p>
+                    
+                    <ul class="list-none space-y-4 text-gray-300 mb-6">
+                        <li class="bg-[#161b22] p-4 rounded flex items-center gap-4 border border-[#30363d]">
+                            <span class="text-2xl font-mono text-blue-400 font-bold w-16 text-center">==</span>
+                            <span><strong>Igualdade:</strong> Verifica se os valores são idênticos. É vital não confundir com o sinal de igual único <code>=</code>, que na programação serve exclusivamente para atribuir valores às variáveis. (Ex: <code>10 == 10</code> resulta em verdadeiro).</span>
+                        </li>
+                        <li class="bg-[#161b22] p-4 rounded flex items-center gap-4 border border-[#30363d]">
+                            <span class="text-2xl font-mono text-blue-400 font-bold w-16 text-center">!=</span>
+                            <span><strong>Diferença:</strong> Verifica se os valores são distintos. (Ex: <code>10 != 5</code> resulta em verdadeiro).</span>
+                        </li>
+                        <li class="bg-[#161b22] p-4 rounded flex items-center gap-4 border border-[#30363d]">
+                            <span class="text-2xl font-mono text-blue-400 font-bold w-16 text-center">> <</span>
+                            <span><strong>Maior e Menor:</strong> Avalia grandezas estritas. (Ex: <code>15 > 10</code> resulta em verdadeiro, mas <code>10 > 10</code> é falso).</span>
+                        </li>
+                        <li class="bg-[#161b22] p-4 rounded flex items-center gap-4 border border-[#30363d]">
+                            <span class="text-2xl font-mono text-blue-400 font-bold w-16 text-center">>= <=</span>
+                            <span><strong>Maior/Menor ou Igual:</strong> Inclui a possibilidade de igualdade na mesma verificação. (Ex: <code>10 >= 10</code> resulta em verdadeiro).</span>
+                        </li>
+                    </ul>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">Testando Comparações no Código:</h4>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    inteiro pontos = 85
+    
+    // As comparações geram e imprimem "verdadeiro" ou "falso"
+    escreva("O aluno passou (pontos >= 50)? ", pontos >= 50, "\\n")
+    escreva("A nota foi perfeita (pontos == 100)? ", pontos == 100)
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 7,
+                title: "Tabela Verdade",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">A Base da Lógica de Computadores</h3>
+                    <p class="mb-4">Muitas vezes, uma única verificação não é suficiente. Precisamos combinar múltiplas condições. A Tabela Verdade mapeia rigorosamente todas as combinações lógicas possíveis. Ela é a base de como o processador analisa decisões complexas.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-6 mt-6">
+                        <div class="bg-[#161b22] p-5 rounded border border-[#30363d]">
+                            <h4 class="text-lg font-semibold text-green-400 mb-3 border-b border-green-900 pb-2">Regra do E (Conjunção)</h4>
+                            <p class="text-sm text-gray-300 mb-4"><strong>Todas</strong> as condições têm de ser verdadeiras. O sistema é rigoroso: se apenas uma falhar, o conjunto inteiro é considerado Falso.</p>
+                            <table class="w-full text-center text-sm border-collapse border border-[#30363d]">
+                                <tr class="bg-[#21262d]"><th class="border border-[#30363d] p-2">Condição 1</th><th class="border border-[#30363d] p-2">Condição 2</th><th class="border border-[#30363d] p-2 text-green-400">Resultado</th></tr>
+                                <tr><td class="border border-[#30363d] p-2">Verdadeiro</td><td class="border border-[#30363d] p-2">Verdadeiro</td><td class="border border-[#30363d] p-2 font-bold text-green-400">Verdadeiro</td></tr>
+                                <tr><td class="border border-[#30363d] p-2">Verdadeiro</td><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-red-400 font-bold">Falso</td></tr>
+                                <tr><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-red-400 font-bold">Falso</td></tr>
+                            </table>
+                        </div>
+                        <div class="bg-[#161b22] p-5 rounded border border-[#30363d]">
+                            <h4 class="text-lg font-semibold text-blue-400 mb-3 border-b border-blue-900 pb-2">Regra do OU (Disjunção)</h4>
+                            <p class="text-sm text-gray-300 mb-4">O sistema é flexível: basta que <strong>pelo menos uma</strong> das condições seja verdadeira para que o conjunto inteiro seja aprovado.</p>
+                            <table class="w-full text-center text-sm border-collapse border border-[#30363d]">
+                                <tr class="bg-[#21262d]"><th class="border border-[#30363d] p-2">Condição 1</th><th class="border border-[#30363d] p-2">Condição 2</th><th class="border border-[#30363d] p-2 text-blue-400">Resultado</th></tr>
+                                <tr><td class="border border-[#30363d] p-2">Verdadeiro</td><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-blue-400 font-bold">Verdadeiro</td></tr>
+                                <tr><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2">Verdadeiro</td><td class="border border-[#30363d] p-2 text-blue-400 font-bold">Verdadeiro</td></tr>
+                                <tr><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-red-400">Falso</td><td class="border border-[#30363d] p-2 text-red-400 font-bold">Falso</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">A Tabela Verdade no Portugol:</h4>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    logico tem_bilhete = verdadeiro
+    logico porta_aberta = falso
+    
+    // Operador E (Conjunção): As duas precisam ser verdadeiras
+    escreva("Pode entrar no cinema? ", tem_bilhete e porta_aberta, "\\n")
+    
+    // Operador OU (Disjunção): Pelo menos uma precisa ser verdadeira
+    escreva("Pode tentar entrar? ", tem_bilhete ou porta_aberta)
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 8,
+                title: "Operadores Lógicos: e, ou, não",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">A Tabela Verdade no Código</h3>
+                    <p class="mb-4">Para aplicar a lógica da tabela verdade nos seus algoritmos, o Portugol utiliza três palavras reservadas essenciais: <code>e</code>, <code>ou</code> e <code>nao</code>. A sua aplicação prática permite validar diferentes condições no mundo real.</p>
+                    
+                    <div class="space-y-6 mt-6">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="text-lg font-semibold text-white mb-2">Operador E</h4>
+                            <p class="mb-2 text-sm text-gray-300">Garante que múltiplas exigências sejam cumpridas ao mesmo tempo. Por exemplo, para passar de ano é necessário ter nota média suficiente E frequência mínima.</p>
+                            <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm">se (nota >= 10 e faltas < 5) {
+  escreva("Aprovado!")
+}</pre>
+                        </div>
+ 
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <h4 class="text-lg font-semibold text-white mb-2">Operador OU</h4>
+                            <p class="mb-2 text-sm text-gray-300">Cria alternativas válidas, onde apenas uma das condições precisa ser verdadeira.</p>
+                            <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm">se (dia == "Sábado" ou dia == "Domingo") {
+  escreva("Fim de semana!")
+}</pre>
+                        </div>
+ 
+                        <div class="border-l-4 border-purple-500 pl-4">
+                            <h4 class="text-lg font-semibold text-white mb-2">Operador NAO (Negação)</h4>
+                            <p class="mb-2 text-sm text-gray-300">Inverte o valor lógico da expressão atual. O que é verdadeiro torna-se falso, e o que é falso torna-se verdadeiro.</p>
+                            <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm">se (nao choveu) {
+  escreva("Vamos jogar futebol!")
+}</pre>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-lg font-semibold text-blue-300 mt-6 mb-4">Programa Completo Combinando a Lógica:</h4>
+                    <p class="mb-4 text-gray-300">Veja como isso ganha vida em um programa real e completo:</p>
+                    <pre class="bg-black p-4 rounded border border-[#30363d] text-blue-300 text-sm mb-4">
+programa {
+  funcao inicio() {
+    real media = 8.5
+    logico recomendacao_professor = verdadeiro
+    
+    // Combinando condições para tomar uma decisão
+    se (media >= 9.0 ou recomendacao_professor == verdadeiro) {
+      escreva("Aprovado para a turma avançada!")
+    } senao {
+      escreva("Direcionado para a turma regular.")
+    }
+  }
+}</pre>
+                `,
+                type: "theory"
+            },
+            {
+                id: 9,
+                title: "Estruturas Condicionais",
+                theory: `
+                    <h3 class="text-2xl font-bold mb-4 text-white">O Cérebro do Programa</h3>
+                    <p class="mb-4">A verdadeira magia da programação acontece quando o programa consegue tomar decisões com base nos dados de entrada. Alcançamos esse comportamento utilizando a estrutura <strong>se...senao</strong> (equivalente ao <em>if...else</em> nas linguagens do mercado).</p>
+                    
+                    <p class="mb-4 text-gray-300">O bloco <code>se</code> inicia avaliando uma expressão lógica. Se o resultado for <strong>VERDADEIRO</strong>, o código dentro das chaves <code>{}</code> é executado. Caso seja <strong>FALSO</strong>, o programa salta esse bloco e executa o bloco <code>senao</code> (se existir), fornecendo um caminho alternativo automático.</p>
+                    
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-6 mt-6">
+                        <h4 class="text-orange-400 font-bold text-sm mb-3">ANATOMIA DE UMA DECISÃO NO CÓDIGO:</h4>
+                        <pre class="bg-black p-4 rounded text-blue-300 text-sm mb-4 border border-[#30363d]">
+programa {
+  funcao inicio() {
+    inteiro idade = 18
+    
+    // A máquina analisa a condição nos parênteses
+    se (idade >= 18) {
+      // Este bloco é executado exclusivamente se for verdade
+      escreva("Acesso liberado. Maior de idade.")
+    } senao {
+      // Caminho de fuga executado exclusivamente se for falso
+      escreva("Acesso restrito. Menor de idade.")
+    }
+  }
+}</pre>
+                    </div>
+                    <p class="mt-6 text-gray-400 italic text-center">Você concluiu toda a base teórica da programação estruturada! Prepare-se para o laboratório prático a seguir, onde aplicará esses conhecimentos.</p>
+                `,
+                type: "theory"
+            },
+            {
+                id: 10,
+                title: "LABORATÓRIO: Desafio Prático",
+                theory: `
+                    <div class="family-card p-6 rounded-xl mb-8">
+                        <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-laptop-code text-yellow-400"></i> Desafio de Programação
+                        </h2>
+                        <p class="text-blue-100 mb-6">
+                            Chegou a hora de colocar os seus conhecimentos à prova! Abra o seu ambiente de desenvolvimento do <strong>Portugol Studio</strong> (ou outro editor de pseudocódigo) e escreva o programa abaixo.
+                        </p>
+                        
+                        <div class="bg-black/50 p-4 rounded-lg mb-6 border border-blue-500/20">
+                            <h4 class="font-bold text-white mb-2">Instruções do Exercício:</h4>
+                            <ul class="text-sm text-blue-200 list-disc ml-4 space-y-2">
+                                <li>Declare as variáveis para armazenar o nome do aluno e sua nota.</li>
+                                <li>Utilize o comando <code>escreva</code> para solicitar a entrada de dados.</li>
+                                <li>Utilize o comando <code>leia</code> para receber os valores digitados no teclado.</li>
+                                <li>Crie uma estrutura condicional <code>se...senao</code> para testar se a nota é maior ou igual a 7.</li>
+                            </ul>
+                        </div>
+
+                        <div class="relative group mt-4">
+                            <div class="absolute right-4 top-4 flex gap-2">
+                                <button onclick="copyToClipboard(event)" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-2 rounded transition-all flex items-center gap-2">
+                                    <i class="fas fa-copy"></i> Copiar Código
+                                </button>
+                            </div>
+                            <pre id="family-code" class="bg-[#0d1117] p-6 rounded-lg border border-[#30363d] text-green-400 text-xs md:text-sm overflow-x-auto shadow-inner">
+programa {
+  funcao inicio() {
+    cadeia nome_aluno
+    real nota
+
+    escreva("Digite o nome do aluno(a): ")
+    leia(nome_aluno)
+
+    escreva("Digite a nota final (0 a 10): ")
+    leia(nota)
+
+    se (nota >= 7.0) {
+      escreva("\\nParabéns! O(A) estudante ", nome_aluno, " foi aprovado(a)!")
+    } senao {
+      escreva("\\nEstude mais! O(A) estudante ", nome_aluno, " ficou de recuperação.")
+    }
+  }
+}</pre>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-white">Confirmação de Execução</h3>
+                    <p class="mb-4">Você conseguiu digitar e executar o código no Portugol Studio com sucesso?</p>
+                `,
+                type: "quiz",
+                options: ["Sim! Executei o código e funcionou perfeitamente!", "Não, ainda estou ajustando a sintaxe ou a lógica."],
+                answer: 0
+            }
+        ];
+
+        let currentModuleIndex = 0;
+        let progress = JSON.parse(localStorage.getItem('portugol_progress')) || [];
+
+        function init() {
+            renderSidebar();
+            loadModule(currentModuleIndex);
+            updateProgressBar();
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebar-nav');
+            const mobileNav = document.getElementById('mobile-nav');
+            nav.innerHTML = '';
+            mobileNav.innerHTML = '';
+
+            modules.forEach((mod, idx) => {
+                const isCompleted = progress.includes(mod.id);
+                const itemHtml = `
+                    <button onclick="goToModule(${idx})" class="sidebar-item w-full text-left px-6 py-4 flex items-center gap-3 transition-all ${currentModuleIndex === idx ? 'active' : 'text-gray-400 hover:text-white'}">
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs border ${isCompleted ? 'bg-green-600 border-green-600 text-white' : 'border-gray-600'}">
+                            ${isCompleted ? '<i class="fas fa-check"></i>' : idx + 1}
+                        </span>
+                        <span class="text-sm font-medium">${mod.title}</span>
+                    </button>
+                `;
+                nav.innerHTML += itemHtml;
+                mobileNav.innerHTML += itemHtml;
+            });
+        }
+
+        function loadModule(index) {
+            const mod = modules[index];
+            currentModuleIndex = index;
+            
+            document.getElementById('current-module-title').innerText = mod.title;
+            const container = document.getElementById('content-container');
+            
+            let activityHtml = '';
+            if (mod.type === 'theory') {
+                const isCompleted = progress.includes(mod.id);
+                activityHtml = `
+                    <div class="mt-10 pt-6 border-t border-[#30363d] flex justify-end">
+                        <button onclick="markTheoryAsRead(event)" class="${isCompleted ? 'bg-green-600 hover:bg-green-500' : 'bg-blue-600 hover:bg-blue-500'} text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg flex items-center gap-2">
+                            ${isCompleted ? '<i class="fas fa-check-double"></i> Aula Revista' : '<i class="fas fa-check-circle"></i> Concluído! Próxima Aula'}
+                        </button>
+                    </div>
+                `;
+            } else if (mod.type === 'quiz') {
+                activityHtml = `
+                    <div class="space-y-3 mt-4" id="quiz-options">
+                        ${mod.options.map((opt, i) => `
+                            <button onclick="checkAnswer(${i})" class="w-full text-left p-4 rounded-lg border border-[#30363d] bg-[#161b22] hover:border-blue-500 transition-all flex justify-between items-center group">
+                                <span>${opt}</span>
+                                <i class="fas fa-chevron-right opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="animate-in fade-in duration-500">
+                    <div class="prose prose-invert max-w-none text-gray-300 leading-relaxed mb-8">
+                        ${mod.theory}
+                    </div>
+                    <div id="feedback-area" class="mt-4 hidden p-4 rounded-lg"></div>
+                    ${activityHtml}
+                </div>
+            `;
+
+            updateNavButtons();
+            renderSidebar();
+            
+            // Scroll para o topo ao carregar novo módulo
+            document.querySelector('main > div').scrollTop = 0;
+        }
+
+        function markTheoryAsRead(event) {
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+            
+            setTimeout(() => {
+                if (!progress.includes(modules[currentModuleIndex].id)) {
+                    progress.push(modules[currentModuleIndex].id);
+                    localStorage.setItem('portugol_progress', JSON.stringify(progress));
+                }
+                updateProgressBar();
+                renderSidebar();
+                
+                const actionCenter = document.getElementById('action-center');
+                const allCompleted = progress.length === modules.length;
+
+                if (allCompleted) {
+                    btn.innerHTML = '<i class="fas fa-check-double"></i> Aula Revista';
+                    actionCenter.innerHTML = `<span class="text-yellow-400 font-bold">🏆 Você é Mestre do Portugol!</span>`;
+                    setTimeout(() => {
+                        document.getElementById('celebration-overlay').classList.remove('hidden');
+                        document.getElementById('celebration-overlay').classList.add('flex');
+                    }, 800);
+                } else {
+                    actionCenter.innerHTML = `
+                        <span class="text-green-500 font-bold flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i> Aula Concluída!
+                        </span>
+                    `;
+
+                    if (currentModuleIndex < modules.length - 1) {
+                        setTimeout(() => {
+                            actionCenter.innerHTML = '';
+                            changeModule(1);
+                        }, 800);
+                    } else {
+                        btn.innerHTML = originalContent;
+                        actionCenter.innerHTML = `<span class="text-yellow-400 font-bold mt-2 text-sm">⚠️ Concluído! Mas faltam aulas anteriores.</span>`;
+                    }
+                }
+            }, 400);
+        }
+
+        function checkAnswer(selectedIndex) {
+            const mod = modules[currentModuleIndex];
+            const buttons = document.querySelectorAll('#quiz-options button');
+            
+            if (selectedIndex === mod.answer) {
+                buttons[selectedIndex].classList.add('bg-green-900', 'border-green-500', 'success-pulse');
+                handleSuccess();
+            } else {
+                buttons[selectedIndex].classList.add('bg-red-900', 'border-red-500', 'shake');
+                setTimeout(() => {
+                    buttons[selectedIndex].classList.remove('bg-red-900', 'border-red-500', 'shake');
+                }, 500);
+            }
+        }
+
+        function validateInputAnswer() {
+            const input = document.getElementById('user-answer');
+            const mod = modules[currentModuleIndex];
+            const val = input.value.trim().toLowerCase();
+            const expected = mod.answer.toString().toLowerCase();
+
+            if (val === expected) {
+                input.classList.add('border-green-500', 'bg-green-900');
+                handleSuccess();
+            } else {
+                input.classList.add('shake', 'border-red-500');
+                setTimeout(() => input.classList.remove('shake', 'border-red-500'), 500);
+            }
+        }
+
+        function handleSuccess() {
+            if (!progress.includes(modules[currentModuleIndex].id)) {
+                progress.push(modules[currentModuleIndex].id);
+                localStorage.setItem('portugol_progress', JSON.stringify(progress));
+            }
+            updateProgressBar();
+            renderSidebar();
+            
+            const actionCenter = document.getElementById('action-center');
+            const allCompleted = progress.length === modules.length;
+
+            if (allCompleted) {
+                actionCenter.innerHTML = `<span class="text-yellow-400 font-bold">🏆 Você é Mestre do Portugol!</span>`;
+                setTimeout(() => {
+                    document.getElementById('celebration-overlay').classList.remove('hidden');
+                    document.getElementById('celebration-overlay').classList.add('flex');
+                }, 800);
+            } else {
+                actionCenter.innerHTML = `
+                    <span class="text-green-500 font-bold animate-bounce flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Excelente!
+                    </span>
+                `;
+
+                if (currentModuleIndex < modules.length - 1) {
+                    setTimeout(() => {
+                        actionCenter.innerHTML = '';
+                        changeModule(1);
+                    }, 1500);
+                } else {
+                    actionCenter.innerHTML = `<span class="text-yellow-400 font-bold mt-2 block text-sm">⚠️ Concluído! Mas faltam aulas anteriores.</span>`;
+                }
+            }
+        }
+
+        function closeCelebration() {
+            document.getElementById('celebration-overlay').classList.add('hidden');
+            document.getElementById('celebration-overlay').classList.remove('flex');
+        }
+
+        function updateProgressBar() {
+            const percent = (progress.length / modules.length) * 100;
+            document.getElementById('main-progress').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${Math.round(percent)}% concluído`;
+        }
+
+        function changeModule(step) {
+            const newIndex = currentModuleIndex + step;
+            if (newIndex >= 0 && newIndex < modules.length) {
+                loadModule(newIndex);
+            }
+        }
+
+        function goToModule(index) {
+            loadModule(index);
+            if (!document.getElementById('mobile-menu').classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btn-prev').disabled = currentModuleIndex === 0;
+            document.getElementById('btn-next').disabled = !progress.includes(modules[currentModuleIndex].id);
+            document.getElementById('action-center').innerHTML = '';
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function copyToClipboard() {
+            const code = document.getElementById('family-code').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            btn.classList.replace('bg-blue-600', 'bg-green-600');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.replace('bg-green-600', 'bg-blue-600');
+            }, 2000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
